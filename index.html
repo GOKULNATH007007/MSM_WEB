@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MSM_Login_Page</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #2196f3, #64b5f6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .login-box {
+      background: white;
+      padding: 40px 30px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.2);
+      border-radius: 12px;
+      text-align: center;
+      width: 350px;
+      animation: fadeIn 1s ease-in;
+    }
+
+    .login-box img {
+      width: 150px;
+      height: auto;
+      margin-bottom: 10px;
+    }
+
+    .login-box h2 {
+      margin: 8px 0;
+      color: #1565c0;
+    }
+
+    .welcome {
+      font-size: 28px;
+      font-weight: bold;
+      animation: blinkColor 1s infinite;
+    }
+
+    @keyframes blinkColor {
+      0%, 100% { color: orange; }
+      50% { color: #1565c0; }
+    }
+
+    input {
+      display: block;
+      margin: 10px auto;
+      padding: 10px;
+      width: 90%;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      background: #1565c0;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #0d47a1;
+    }
+
+    a {
+      display: block;
+      margin-top: 12px;
+      color: #0d47a1;
+      font-size: 14px;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="login-box">
+    <img src="nttf_logo.png" alt="NTTF Logo" />
+    <h2 class="welcome">!! WELCOME !!</h2>
+    <h2>MSM_WEB_PAGE</h2>
+    <h2>LOGIN</h2>
+    <input type="text" id="username" placeholder="Enter Username" />
+    <input type="password" id="password" placeholder="Enter Password" />
+    <button onclick="login()">Login</button>
+    <a onclick="window.location.href='register.html'">Register</a>
+  </div>
+
+  <script>
+    function login() {
+      const user = document.getElementById("username").value;
+      const pass = document.getElementById("password").value;
+
+      if (user === "Gokulnath.H" && pass === "Gokulg4768") {
+        window.location.href = "web_developer.html";
+      } else {
+        const stored = JSON.parse(localStorage.getItem(user));
+        if (stored && stored.password === pass) {
+          if (stored.role === "Maintenance") {
+            window.location.href = "M-login.html";
+          } else if (stored.role === "Section In Charge") {
+            window.location.href = "I-page.html";
+          } else if (stored.role === "Manager") {
+            window.location.href = "MA-page.html";
+          } else {
+            alert("Role not found.");
+          }
+        } else {
+          alert("Invalid username or password");
+        }
+      }
+    }
+  </script>
+</body>
+</html>

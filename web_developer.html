@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Web Developer Panel</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: url('Background.png') no-repeat center center fixed;
+      background-size: cover;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+
+    .logo {
+      width: 150px;
+      margin-top: 20px;
+    }
+
+    h1 {
+      margin-top: 10px;
+      color: #333;
+    }
+
+    .nav-buttons {
+      margin: 20px 0;
+    }
+
+    .nav-buttons button {
+      padding: 10px 20px;
+      margin: 0 10px;
+      border: none;
+      background-color: #1565c0;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .nav-buttons button:hover {
+      background-color: #0d47a1;
+    }
+
+    .logout {
+      margin-top: 10px;
+      color: red;
+      cursor: pointer;
+      font-weight: bold;
+      display: block;
+      text-decoration: underline;
+    }
+
+    table {
+      width: 90%;
+      margin: 30px auto;
+      border-collapse: collapse;
+      background-color: rgba(255, 255, 255, 0.95);
+    }
+
+    th, td {
+      padding: 12px;
+      border: 1px solid #bbb;
+    }
+
+    th {
+      background-color: #1565c0;
+      color: white;
+    }
+
+    .delete {
+      color: red;
+      cursor: pointer;
+      font-size: 18px;
+    }
+
+    .status-pending {
+      color: red;
+      font-weight: bold;
+    }
+
+    .status-finished {
+      color: green;
+      font-weight: bold;
+    }
+
+    .welcome {
+      position: fixed;
+      bottom: 10px;
+      width: 100%;
+      color: rgb(241, 73, 7);
+      font-size: 20px;
+      font-weight: bold;
+      animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <img src="nttf_logo.png" alt="NTTF Logo" class="logo" />
+  <div class="welcome">Welcome to Web Developer Panel</div>
+
+  <div class="nav-buttons">
+    <button onclick="location.href='M-login.html'">Maintenance Page</button>
+    <button onclick="location.href='I-page.html'">Section In charge Page</button>
+  </div>
+
+  <a class="logout" onclick="logout()">Logout</a>
+
+  <!-- ✅ USERS TABLE -->
+  <table id="userTable">
+    <thead>
+      <tr>
+        <th>Username</th>
+        <th>Password</th>
+        <th>Role</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <!-- ✅ COMPLAINTS TABLE -->
+  <table id="complaintTable">
+    <thead>
+      <tr>
+        <th>Row No</th>
+        <th>Machine</th>
+        <th>Owner</th>
+        <th>Machine No</th>
+        <th>Section</th>
+        <th>Defect</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    function loadUsers() {
+      const tbody = document.querySelector("#userTable tbody");
+      tbody.innerHTML = "";
+
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        const data = JSON.parse(localStorage.getItem(key));
+
+        if (data && data.username && data.password && data.role) {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${data.username}</td>
+            <td>${data.password}</td>
+            <td>${data.role}</td>
+            <td><span class="delete" onclick="deleteUser('${key}')">&#128465;</span></td>
+          `;
+          tbody.appendChild(tr);
+        }
+      }
+    }
+
+    function deleteUser(key) {
+      localStorage.removeItem(key);
+      loadUsers();
+    }
+
+    function loadComplaints() {
+      const tbody = document.querySelector("#complaintTable tbody");
+      tbody.innerHTML = "";
+
+      const complaints = JSON.parse(localStorage.getItem("maintenanceData") || "[]");
+      let rowNumber = 1;
+
+      complaints.forEach((c) => {
+        const tr = document.createElement("tr");
+
+        const statusClass = c.finished ? "status-finished" : "status-pending";
+        const statusText = c.finished ? "Finished" : "Pending";
+        const deleteBtn = c.finished ? `<span class="delete" onclick="deleteComplaint(${c.id})">&#128465;</span>` : "";
+
+        tr.innerHTML = `
+          <td>${rowNumber++}</td>
+          <td>${c.machine}</td>
+          <td>${c.owner}</td>
+          <td>${c.machineNumber}</td>
+          <td>${c.section}</td>
+          <td>${c.defect}</td>
+          <td class="${statusClass}">${statusText}</td>
+          <td>${deleteBtn}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function deleteComplaint(id) {
+      let complaints = JSON.parse(localStorage.getItem("maintenanceData") || "[]");
+      complaints = complaints.filter(c => !(c.id === id && c.finished));
+      localStorage.setItem("maintenanceData", JSON.stringify(complaints));
+      loadComplaints();
+    }
+
+    function logout() {
+      location.href = "index.html";
+    }
+
+    // Initial load
+    loadUsers();
+    loadComplaints();
+    setInterval(() => {
+      loadUsers();
+      loadComplaints();
+    }, 2000);
+  </script>
+</body>
+</html>
+

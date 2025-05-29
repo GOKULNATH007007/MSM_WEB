@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>VTC/IM/001</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      font-size: 11px;
+      margin: 10px;
+      background-color: #f8f9fa;
+    }
+    input[readonly], input[type="text"], input[type="date"] {
+      background-color: #fff;
+      padding: 4px;
+      font-size: 11px;
+      width: 95%;
+      border-radius: 3px;
+      border: 1px solid #ccc;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      font-size: 11px;
+    }
+    table, th, td {
+      border: 1px solid #000;
+    }
+    th {
+      background-color: #1565c0;
+      color: white;
+    }
+    th, td {
+      padding: 4px;
+      text-align: left;
+    }
+    h2 {
+      margin: 2px 0;
+      font-size: 14px;
+    }
+    .header-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo {
+      height: 40px;
+    }
+    label {
+      display: inline-block;
+      margin: 4px 0;
+      font-weight: bold;
+    }
+    .button-group {
+      margin-top: 10px;
+    }
+    .button-green {
+      background-color: #28a745;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      font-size: 12px;
+      margin: 5px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    .button-gray {
+      background-color: #6c757d;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      font-size: 12px;
+      margin: 5px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    .footer {
+      margin-top: 10px;
+      font-weight: bold;
+      color: #888;
+    }
+    @media print {
+      .button-group {
+        display: none;
+      }
+    }
+  </style>
+  <script>
+    function saveData() {
+      const data = {
+        machine: document.getElementById("machine").value,
+        machineCode: document.getElementById("machineCode").value,
+        date: document.getElementById("date").value,
+        pmDate: document.getElementById("pm_date").value,
+        nextDue: document.getElementById("next_due_date").value,
+        statuses: {},
+        remarks: {}
+      };
+      for (let i = 1; i <= 19; i++) {
+        const s = String(i).padStart(2, "0");
+        data.statuses["status" + s] = document.getElementById("status" + s).value;
+        data.remarks["remarks" + s] = document.getElementById("remarks" + s).value;
+      }
+      localStorage.setItem("im_maintenanceData", JSON.stringify(data));
+      alert("Data for IM machine saved successfully.");
+    }
+
+    function loadData() {
+      const saved = localStorage.getItem("im_maintenanceData");
+      if (saved) {
+        const data = JSON.parse(saved);
+        document.getElementById("machine").value = data.machine;
+        document.getElementById("machineCode").value = data.machineCode;
+        document.getElementById("date").value = data.date;
+        document.getElementById("pm_date").value = data.pmDate;
+        document.getElementById("next_due_date").value = data.nextDue;
+        for (let i = 1; i <= 19; i++) {
+          const s = String(i).padStart(2, "0");
+          document.getElementById("status" + s).value = data.statuses["status" + s] || "";
+          document.getElementById("remarks" + s).value = data.remarks["remarks" + s] || "";
+        }
+      }
+    }
+
+    function printPage() {
+      window.print();
+    }
+
+    window.onload = loadData;
+  </script>
+</head>
+<body>
+  <div class="header-container">
+    <div>
+      <h2>NETTUR TECHNICALTRAINING FOUNDATION</h2>
+      <h2>PREVENTIVE MAINTENANCE CHECKLIST</h2>
+    </div>
+    <img src="nttf_logo.png" alt="NTTF Logo" class="logo">
+  </div>
+
+  <form>
+    <label>MACHINE: <input type="text" id="machine"></label>
+    <label>MACHINE CODE: <input type="text" id="machineCode"></label>
+    <label>Date: <input type="date" id="date"></label>
+
+    <table>
+      <tr><th>Sl.No</th><th>Description</th><th>Status</th><th>Remarks</th></tr>
+      <script>
+        const desc = [
+          "OIL NIPPLE", "BELT", "BELT TENSION", "GEAR TRAIN",
+          "NOISE", "OIL LEVEL", "SPINDLE PLAY", "AXIS PLAY X,Y,Z",
+          "TOOL HOLDING", "WORK HOLDING", "JIBS",
+          "LEAD SCREW/NUT", "BED", "ELECTRICAL",
+          "MOTOR", "ACCESSORIES", "LUB PUMP",
+          "COOLANT SYSTEM", "HYDRAULIC SYSTEM"
+        ];
+        desc.forEach((d, i) => {
+          const n = String(i + 1).padStart(2, '0');
+          document.write(`<tr>
+            <td>${n}</td>
+            <td>${d}</td>
+            <td><input type="text" id="status${n}"></td>
+            <td><input type="text" id="remarks${n}"></td>
+          </tr>`);
+        });
+      </script>
+    </table>
+
+    <label>PM DATE: <input type="date" id="pm_date"></label>
+    <label>NEXT DUE: <input type="date" id="next_due_date"></label><br>
+    <div class="footer">IMSL-7106</div>
+
+    <div class="button-group">
+      <button type="button" class="button-green" onclick="saveData()">Save</button>
+      <button type="button" class="button-green" onclick="printPage()">Print</button>
+      <button type="button" class="button-gray" onclick="history.back()">Back</button>
+    </div>
+  </form>
+</body>
+</html>

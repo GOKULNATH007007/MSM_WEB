@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>M-PAGE - Maintenance Section</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: url('Background.png') no-repeat center center fixed;
+      background-size: cover;
+      padding: 20px;
+      text-align: center;
+      margin: 0;
+    }
+    .logo { width: 150px; margin-bottom: 20px; }
+    h2 { color: #1565c0; }
+    .button-group {
+      margin: 20px 0;
+    }
+    .button-group button {
+      margin: 10px;
+      padding: 12px 24px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      border-radius: 5px;
+      background-color: #1565c0;
+      color: white;
+      font-weight: bold;
+    }
+    .button-group button:hover {
+      background-color: #0d47a1;
+    }
+    .blinker {
+      font-size: 20px;
+      font-weight: bold;
+      color: red;
+      animation: blink 1s linear infinite;
+      margin-top: 20px;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+    .complaint-btn {
+      display: block;
+      width: 80%;
+      margin: 10px auto;
+      padding: 12px;
+      border: none;
+      border-radius: 0;
+      font-weight: bold;
+      cursor: pointer;
+      background-color: red;
+      color: white;
+      box-sizing: border-box;
+      text-align: center;
+    }
+    .complaint-btn.yellow {
+      background-color: yellow;
+      color: black;
+    }
+    .complaint-table {
+      width: 80%;
+      margin: 20px auto;
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    }
+    .complaint-table td {
+      padding: 8px;
+      text-align: left;
+    }
+    .popup-buttons {
+      margin-top: 20px;
+    }
+    .popup-buttons button {
+      margin: 5px;
+      padding: 10px 20px;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      border: none;
+    }
+    .finish-btn { background-color: green; color: white; }
+    .close-btn { background-color: gray; color: white; }
+    .logout-btn {
+      margin-top: 30px;
+      padding: 10px 20px;
+      background-color: red;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .welcome {
+      font-size: 28px;
+      font-weight: bold;
+      animation: blinkColor 1s infinite;
+    }
+    @keyframes blinkColor {
+      0%, 100% { color: orange; }
+      50% { color: #1565c0; }
+    }
+  </style>
+</head>
+<body>
+  <img src="nttf_logo.png" alt="NTTF Logo" class="logo" />
+  <h2 class="welcome">NETTUR TECHNICAL TRAINING FOUNDATION</h2>
+  <h2>MACHINE LISTS</h2>
+
+  <div class="button-group">
+    <button onclick="window.location.href='VTC_IM_001.html'">VTC/IM/001</button>
+    <button onclick="window.location.href='VTC_HP_001.html'">VTC/HP/001</button>
+  </div>
+
+  <div id="blinker" class="blinker" style="display: none;">
+    Breakdown maintenance complaint raised
+  </div>
+
+  <!-- ❌ Removed: <h2>Manage Complaints</h2> -->
+  <!-- ❌ Removed: Complaint Table (Username | Complaint | Status | Action) -->
+
+  <div id="complaintButtons"></div>
+  <div id="complaintPopup"></div>
+
+  <button class="logout-btn" onclick="window.location.href='index.html'">Logout</button>
+
+  <script>
+    let activeIndex = null;
+
+    function loadComplaints() {
+      if (activeIndex !== null) return;
+
+      const complaints = JSON.parse(localStorage.getItem("maintenanceData") || "[]");
+      const buttonsDiv = document.getElementById("complaintButtons");
+      const popup = document.getElementById("complaintPopup");
+
+      buttonsDiv.innerHTML = "";
+      popup.innerHTML = "";
+
+      let hasPending = false;
+
+      complaints.forEach((c, index) => {
+        const btn = document.createElement("button");
+        btn.className = "complaint-btn";
+        btn.innerText = `Complaint No: ${c.id}`;
+
+        if (c.finished && !c.confirmed) {
+          btn.classList.add("yellow");
+        } else if (c.sent && !c.finished) {
+          hasPending = true;
+        }
+
+        btn.onclick = () => showComplaintPopup(index);
+        buttonsDiv.appendChild(btn);
+      });
+
+      document.getElementById("blinker").style.display = hasPending ? "block" : "none";
+    }
+
+    function showComplaintPopup(index) {
+      activeIndex = index;
+      const complaints = JSON.parse(localStorage.getItem("maintenanceData") || "[]");
+      const c = complaints[index];
+
+      const popup = document.getElementById("complaintPopup");
+      popup.innerHTML = `
+        <table class="complaint-table">
+          <tr><td><strong>Machine:</strong></td><td>${c.machine}</td></tr>
+          <tr><td><strong>Owner:</strong></td><td>${c.owner}</td></tr>
+          <tr><td><strong>Machine no. :</strong></td><td>${c.machineNumber}</td></tr>
+          <tr><td><strong>Section:</strong></td><td>${c.section}</td></tr>
+          <tr><td><strong>Defect:</strong></td><td>${c.defect}</td></tr>
+        </table>
+        <div class="popup-buttons">
+          ${!c.finished ? `<button class="finish-btn" onclick="markAsFinished(${index})">Finish</button>` : ''}
+          <button class="close-btn" onclick="closePopup()">Close</button>
+        </div>
+      `;
+    }
+
+    function closePopup() {
+      activeIndex = null;
+      document.getElementById("complaintPopup").innerHTML = "";
+      loadComplaints();
+    }
+
+    function markAsFinished(index) {
+      const complaints = JSON.parse(localStorage.getItem("maintenanceData") || "[]");
+      complaints[index].finished = true;
+      localStorage.setItem("maintenanceData", JSON.stringify(complaints));
+
+      // Notify I-page if open
+      if (iPageWindow) {
+        iPageWindow.postMessage({ action: "updateComplaints" }, "*");
+      }
+
+      closePopup();
+    }
+
+    // Listen for OKAY press from I-page
+    window.addEventListener("message", (event) => {
+      if (event.data && event.data.action === 'removeComplaint' && typeof event.data.id !== 'undefined') {
+        let complaints = JSON.parse(localStorage.getItem("maintenanceData") || "[]");
+        complaints = complaints.filter(c => c.id !== event.data.id);
+        localStorage.setItem("maintenanceData", JSON.stringify(complaints));
+        loadComplaints();
+      }
+    });
+
+    let iPageWindow = null;
+    setInterval(loadComplaints, 1000);
+    loadComplaints();
+    
+  </script>
+</body>
+</html>

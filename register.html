@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register - MSM Web Page</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: url('Background.png') no-repeat center center fixed;
+      background-size: contain;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .register-box {
+      background-color: rgba(255, 255, 255, 0.97);
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+      animation: fadeIn 1s ease-in;
+    }
+
+    .register-box img {
+      width: 150px;
+      height: auto;
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      color: #1565c0;
+      margin-bottom: 20px;
+    }
+
+    input, select {
+      width: 90%;
+      margin: 10px auto;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      display: block;
+      font-size: 14px;
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      background: #1565c0;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background: #0d47a1;
+    }
+
+    a {
+      display: block;
+      margin-top: 12px;
+      color: #0d47a1;
+      font-size: 14px;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="register-box">
+    <img src="nttf_logo.png" alt="NTTF Logo" />
+    <h2>Create an Account</h2>
+    <input type="text" id="username" placeholder="Enter Username" required />
+    <input type="password" id="password" placeholder="Enter Password" required />
+    <select id="role" required>
+      <option value="">Select Role</option>
+      <option value="Maintenance">Maintenance</option>
+      <option value="Section In Charge">Section In Charge</option>
+    </select>
+    <button onclick="register()">Register</button>
+    <a onclick="window.location.href='index.html'">Back to Login</a>
+  </div>
+
+  <script>
+    function register() {
+      const user = document.getElementById("username").value;
+      const pass = document.getElementById("password").value;
+      const role = document.getElementById("role").value;
+
+      if (user === "" || pass === "" || role === "") {
+        alert("Please fill out all fields.");
+        return;
+      }
+
+      const userData = {
+        username: user,
+        password: pass,
+        role: role
+      };
+
+      localStorage.setItem(user, JSON.stringify(userData));
+      alert("Registered successfully!");
+      window.location.href = "index.html";
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,162 @@
+c:\Users\admin\Desktop\MSM_WEB_PAGE - Copy\I-page.html<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>I-PAGE - Create Maintenance Complaint</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(rgba(255,255,255,0.6), rgba(255,255,255,0.6)), url('Background.png') no-repeat center center fixed;
+      background-size: cover;
+      padding: 20px;
+      margin: 0;
+    }
+    .logo { width: 150px; display: block; margin: auto; }
+    h2 { text-align: center; color: #1565c0; }
+    .form-section, .complaint-details {
+      max-width: 800px;
+      margin: 20px auto;
+      background-color: rgba(255,255,255,0.95);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    }
+    input, textarea, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+      max-height: 200px;
+      white-space: pre-wrap;
+    }
+    button {
+      background-color: #1565c0;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0d47a1;
+    }
+    .complaint-btn {
+      display: block;
+      width: 90%;
+      margin: 10px auto;
+      padding: 12px;
+      border: none;
+      border-radius: 0;
+      font-weight: bold;
+      cursor: pointer;
+      text-align: center;
+      background-color: red;
+      color: white;
+    }
+    .complaint-btn.yellow {
+      background-color: orange;
+      color: black;
+    }
+    .complaint-table {
+      width: 100%;
+      margin-top: 20px;
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      text-align: left;
+    }
+    .complaint-table td {
+      padding: 8px;
+    }
+    .popup-buttons {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .okay-btn {
+      background-color: orange;
+      color: black;
+      font-weight: bold;
+      margin-right: 10px;
+    }
+    .close-btn {
+      background-color: gray;
+      color: white;
+      font-weight: bold;
+    }
+    .welcome {
+      font-size: 28px;
+      font-weight: bold;
+      animation: blinkColor 1s infinite;
+    }
+    @keyframes blinkColor {
+      0%, 100% { color: orange; }
+      50% { color: #1565c0; }
+    }
+  </style>
+</head>
+<body>
+  <img src="nttf_logo.png" alt="NTTF Logo" class="logo" />
+  <h2 class="welcome">NETTUR TECHNICAL TRAINING FOUNDATION</h2>
+  <h2>BREAKDOWN MAINTENANCE COMPLAINT REPORT</h2>
+
+  <div class="form-section">
+    <input type="date" id="machine" placeholder="Breakdown Date" />
+    <input type="text" id="owner" placeholder="Machine Owner" />
+    <input type="text" id="machineNumber" placeholder="Machine Number" />
+    <input type="text" id="section" placeholder="Section" />
+    <textarea id="defect" placeholder="Defect Description"></textarea>
+    <button onclick="sendComplaint()">Send</button>
+  </div>
+
+  <h2 id="pageTitle" style="display:none;">Complaints</h2>
+  <div id="complaintButtons"></div>
+  <div id="complaintPopup"></div>
+  
+
+  <script src="i_page.js"></script>
+<script>
+  function loadComplaints() {
+  const tbody = document.querySelector("#complaintTable tbody");
+  tbody.innerHTML = "";
+
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    const data = JSON.parse(localStorage.getItem(key));
+
+    if (data && data.complaint) {
+      let btnStyle = "background-color: red; color: white;"; // Default: pending
+
+      if (data.status === "finished") {
+        btnStyle = "background-color: yellow; color: black;";
+      }
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${data.username || "-"}</td>
+        <td>${data.complaint}</td>
+        <td>
+          <button style="${btnStyle}" onclick="markFinished('${key}')">Finish</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    }
+  }
+}
+function markOkay(key) {
+  const data = JSON.parse(localStorage.getItem(key));
+  if (data) {
+    data.status = "okay"; // mark as okay (yellow)
+    localStorage.setItem(key, JSON.stringify(data));
+    loadComplaints(); // refresh table on I-page
+  }
+}
+
+</script>
+</body>
+</html>
